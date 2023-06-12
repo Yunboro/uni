@@ -1,0 +1,143 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{Coin recognition, real life application}
+\PYG{l+s+sd}{task: calculate the value of coins on picture}
+\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+\PYG{k+kn}{import} \PYG{n+nn}{cv2}
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+
+\PYG{k}{def} \PYG{n+nf}{detect\PYGZus{}coins}\PYG{p}{():}
+    \PYG{n}{coins} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{imread}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}./number.jpg\PYGZsq{}}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{)}
+
+    \PYG{n}{gray} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{cvtColor}\PYG{p}{(}\PYG{n}{coins}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{COLOR\PYGZus{}BGR2GRAY}\PYG{p}{)}
+    \PYG{n}{img} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{medianBlur}\PYG{p}{(}\PYG{n}{gray}\PYG{p}{,} \PYG{l+m+mi}{7}\PYG{p}{)}
+    \PYG{n}{circles} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{HoughCircles}\PYG{p}{(}
+        \PYG{n}{img}\PYG{p}{,}  \PYG{c+c1}{\PYGZsh{} input image}
+        \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{HOUGH\PYGZus{}GRADIENT}\PYG{p}{,}  \PYG{c+c1}{\PYGZsh{} type of detection}
+        \PYG{n}{dp}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{}inverse ratio of resolution}
+        \PYG{n}{minDist} \PYG{o}{=} \PYG{l+m+mi}{50}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{}minimum distance between detected circled}
+        \PYG{n}{param1}\PYG{o}{=}\PYG{l+m+mi}{145}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{}internal threshold for internal canny edge detector}
+        \PYG{n}{param2}\PYG{o}{=}\PYG{l+m+mi}{60}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{}threshold for center detection}
+        \PYG{n}{minRadius}\PYG{o}{=}\PYG{l+m+mi}{10}\PYG{p}{,}  \PYG{c+c1}{\PYGZsh{} mininmum radius to be detected. if unknown, put zero as default}
+        \PYG{n}{maxRadius}\PYG{o}{=}\PYG{l+m+mi}{380}\PYG{p}{,}  \PYG{c+c1}{\PYGZsh{} max radius to be detected. if unknown, put zero as default}
+    \PYG{p}{)}
+
+    \PYG{n}{coins\PYGZus{}copy} \PYG{o}{=} \PYG{n}{coins}\PYG{o}{.}\PYG{n}{copy}\PYG{p}{()}
+
+
+    \PYG{k}{for} \PYG{n}{detected\PYGZus{}circle} \PYG{o+ow}{in} \PYG{n}{circles}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]:}
+        \PYG{n}{x\PYGZus{}coor}\PYG{p}{,} \PYG{n}{y\PYGZus{}coor}\PYG{p}{,} \PYG{n}{detected\PYGZus{}radius} \PYG{o}{=} \PYG{n}{detected\PYGZus{}circle}
+        \PYG{n}{coins\PYGZus{}detected} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{circle}\PYG{p}{(}
+            \PYG{n}{coins\PYGZus{}copy}\PYG{p}{,}
+            \PYG{p}{(}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{x\PYGZus{}coor}\PYG{p}{),} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{y\PYGZus{}coor}\PYG{p}{)),}
+            \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{detected\PYGZus{}radius}\PYG{p}{),}
+            \PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{255}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{),}
+            \PYG{l+m+mi}{4}\PYG{p}{,}
+        \PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{circles}\PYG{p}{)}
+    \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{imwrite}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}./test\PYGZus{}Hough.jpg\PYGZdq{}}\PYG{p}{,} \PYG{n}{coins\PYGZus{}detected}\PYG{p}{)}
+
+    \PYG{k}{return} \PYG{n}{circles}
+
+\PYG{k}{def} \PYG{n+nf}{calculate\PYGZus{}amount}\PYG{p}{():} \PYG{c+c1}{\PYGZsh{}die ratio ist der Quotient bezogen auf den durchmesser 1 cent}
+    \PYG{n}{eurparam} \PYG{o}{=} \PYG{p}{\PYGZob{}}
+        \PYG{l+s+s2}{\PYGZdq{}1 cent\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}
+            \PYG{l+s+s2}{\PYGZdq{}value\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{0.01}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}radius\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{16.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}ratio\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{16.25}\PYG{o}{/}\PYG{l+m+mf}{16.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}count\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mi}{0}\PYG{p}{,}
+        \PYG{p}{\PYGZcb{},}
+        \PYG{l+s+s2}{\PYGZdq{}2 cent\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}
+            \PYG{l+s+s2}{\PYGZdq{}value\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{0.02}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}radius\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{18.75}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}ratio\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{18.75}\PYG{o}{/}\PYG{l+m+mf}{16.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}count\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mi}{0}\PYG{p}{,}
+        \PYG{p}{\PYGZcb{},}
+        \PYG{l+s+s2}{\PYGZdq{}5 cent\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}
+            \PYG{l+s+s2}{\PYGZdq{}value\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{0.05}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}radius\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{21.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}ratio\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{21.25}\PYG{o}{/}\PYG{l+m+mf}{16.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}count\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mi}{0}\PYG{p}{,}
+        \PYG{p}{\PYGZcb{},}
+        \PYG{l+s+s2}{\PYGZdq{}10 cent\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}
+            \PYG{l+s+s2}{\PYGZdq{}value\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{0.10}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}radius\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{19.75}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}ratio\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{19.75}\PYG{o}{/}\PYG{l+m+mf}{16.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}count\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mi}{0}\PYG{p}{,}
+        \PYG{p}{\PYGZcb{},}
+        \PYG{l+s+s2}{\PYGZdq{}20 cent\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}
+            \PYG{l+s+s2}{\PYGZdq{}value\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{0.20}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}radius\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{22.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}ratio\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{22.25}\PYG{o}{/}\PYG{l+m+mf}{16.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}count\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mi}{0}\PYG{p}{,}
+        \PYG{p}{\PYGZcb{},}
+        \PYG{l+s+s2}{\PYGZdq{}50 cent\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}
+            \PYG{l+s+s2}{\PYGZdq{}value\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{0.50}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}radius\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{24.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}ratio\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{24.25}\PYG{o}{/}\PYG{l+m+mf}{16.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}count\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mi}{0}\PYG{p}{,}
+        \PYG{p}{\PYGZcb{},}
+        \PYG{l+s+s2}{\PYGZdq{}1 Euro\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}
+            \PYG{l+s+s2}{\PYGZdq{}value\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mi}{1}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}radius\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{23.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}ratio\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{23.25}\PYG{o}{/}\PYG{l+m+mf}{16.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}count\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mi}{0}\PYG{p}{,}
+        \PYG{p}{\PYGZcb{},}
+        \PYG{l+s+s2}{\PYGZdq{}2 Euro\PYGZdq{}}\PYG{p}{:} \PYG{p}{\PYGZob{}}
+            \PYG{l+s+s2}{\PYGZdq{}value\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mi}{2}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}radius\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{25.5}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}ratio\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mf}{25.5}\PYG{o}{/}\PYG{l+m+mf}{16.25}\PYG{p}{,}
+            \PYG{l+s+s2}{\PYGZdq{}count\PYGZdq{}}\PYG{p}{:} \PYG{l+m+mi}{0}\PYG{p}{,}
+        \PYG{p}{\PYGZcb{},}
+    \PYG{p}{\PYGZcb{}}
+
+    \PYG{n}{circles} \PYG{o}{=} \PYG{n}{detect\PYGZus{}coins}\PYG{p}{()}
+    \PYG{n}{radius} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{n}{coordinates} \PYG{o}{=} \PYG{p}{[]}
+
+    \PYG{k}{for} \PYG{n}{detected\PYGZus{}circle} \PYG{o+ow}{in} \PYG{n}{circles}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]:}
+        \PYG{n}{x\PYGZus{}coor}\PYG{p}{,} \PYG{n}{y\PYGZus{}coor}\PYG{p}{,} \PYG{n}{detected\PYGZus{}radius} \PYG{o}{=} \PYG{n}{detected\PYGZus{}circle}
+        \PYG{n}{radius}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{detected\PYGZus{}radius}\PYG{p}{)}
+        \PYG{n}{coordinates}\PYG{o}{.}\PYG{n}{append}\PYG{p}{([}\PYG{n}{x\PYGZus{}coor}\PYG{p}{,} \PYG{n}{y\PYGZus{}coor}\PYG{p}{])}
+
+    \PYG{n}{smallest} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{radius}\PYG{p}{)}
+    \PYG{n}{tolerance} \PYG{o}{=} \PYG{l+m+mf}{0.03}
+    \PYG{n}{total\PYGZus{}amount} \PYG{o}{=} \PYG{l+m+mi}{0}
+
+    \PYG{n}{coins\PYGZus{}circled} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{imread}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}./test\PYGZus{}Hough.jpg\PYGZsq{}}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{)}
+    \PYG{n}{font} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{FONT\PYGZus{}HERSHEY\PYGZus{}SIMPLEX}
+
+    \PYG{k}{for} \PYG{n}{coin} \PYG{o+ow}{in} \PYG{n}{circles}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]:}
+        \PYG{n}{ratio\PYGZus{}to\PYGZus{}check} \PYG{o}{=} \PYG{n}{coin}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{]} \PYG{o}{/} \PYG{n}{smallest} \PYG{c+c1}{\PYGZsh{}berechnen aller}
+        \PYG{n}{coor\PYGZus{}x} \PYG{o}{=} \PYG{n}{coin}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+        \PYG{n}{coor\PYGZus{}y} \PYG{o}{=} \PYG{n}{coin}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}
+
+        \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n}{eurparam}\PYG{p}{:}
+            \PYG{n}{value} \PYG{o}{=} \PYG{n}{eurparam}\PYG{p}{[}\PYG{n}{i}\PYG{p}{][}\PYG{l+s+s1}{\PYGZsq{}value\PYGZsq{}}\PYG{p}{]}
+            \PYG{n}{ratio} \PYG{o}{=} \PYG{n}{eurparam}\PYG{p}{[}\PYG{n}{i}\PYG{p}{][}\PYG{l+s+s1}{\PYGZsq{}ratio\PYGZsq{}}\PYG{p}{]}
+            \PYG{c+c1}{\PYGZsh{}if value == 1:}
+            \PYG{c+c1}{\PYGZsh{}    print(abs(ratio\PYGZus{}to\PYGZus{}check \PYGZhy{} eurparam[i][\PYGZsq{}ratio\PYGZsq{}]))}
+            \PYG{c+c1}{\PYGZsh{}    print(eurparam[i][\PYGZsq{}value\PYGZsq{}])}
+
+            \PYG{k}{if} \PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{ratio\PYGZus{}to\PYGZus{}check} \PYG{o}{\PYGZhy{}} \PYG{n}{ratio}\PYG{p}{)} \PYG{o}{\PYGZlt{}=} \PYG{n}{tolerance}\PYG{p}{:}
+                \PYG{n+nb}{print}\PYG{p}{(}\PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{ratio\PYGZus{}to\PYGZus{}check} \PYG{o}{\PYGZhy{}} \PYG{n}{ratio}\PYG{p}{))}
+                \PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{value}\PYG{p}{)}
+                \PYG{n}{eurparam}\PYG{p}{[}\PYG{n}{i}\PYG{p}{][}\PYG{l+s+s1}{\PYGZsq{}count\PYGZsq{}}\PYG{p}{]} \PYG{o}{+=} \PYG{l+m+mi}{1} \PYG{c+c1}{\PYGZsh{}Zugriff auf Variable}
+                \PYG{n}{total\PYGZus{}amount} \PYG{o}{+=} \PYG{n}{value}
+                \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{putText}\PYG{p}{(}\PYG{n}{coins\PYGZus{}circled}\PYG{p}{,} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{value}\PYG{p}{),} \PYG{p}{(}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{coor\PYGZus{}x}\PYG{p}{),} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{coor\PYGZus{}y}\PYG{p}{)),} \PYG{n}{font}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,}
+                            \PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{),} \PYG{l+m+mi}{4}\PYG{p}{)}
+
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}The total amount is }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{total\PYGZus{}amount}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ Euro\PYGZdq{}}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n}{eurparam}\PYG{p}{:}
+        \PYG{n}{pieces} \PYG{o}{=} \PYG{n}{eurparam}\PYG{p}{[}\PYG{n}{i}\PYG{p}{][}\PYG{l+s+s1}{\PYGZsq{}count\PYGZsq{}}\PYG{p}{]}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{i}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{pieces}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{x\PYGZdq{}}\PYG{p}{)}
+
+
+    \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{imwrite}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}./test\PYGZus{}Hough.jpg\PYGZdq{}}\PYG{p}{,} \PYG{n}{coins\PYGZus{}circled}\PYG{p}{)}
+
+
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZdq{}}\PYG{p}{:}
+    \PYG{n}{calculate\PYGZus{}amount}\PYG{p}{()}
+\end{Verbatim}

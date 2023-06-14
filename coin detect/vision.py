@@ -17,7 +17,7 @@ task: calculate the value of coins on picture
 import cv2
 import numpy as np
 
-imagename = 'coins5.jpg'
+imagename = 'coins.jpg'
 
 def detect_coins():
     coins = cv2.imread(imagename, 1)
